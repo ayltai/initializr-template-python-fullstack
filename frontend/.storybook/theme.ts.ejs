@@ -1,0 +1,9 @@
+import { themes, type ThemeVars, } from '@storybook/theming';
+import { THEME } from '../src/constants';
+
+export const theme : ThemeVars = {
+    ...themes.dark,
+    brandTitle   : '<%= name %>',
+    colorPrimary : THEME.token.colorPrimary,
+    appBg        : THEME.token.colorBgLayout,
+};
