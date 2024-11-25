@@ -1,0 +1,10 @@
+{
+    "name"    : "Debian",
+    "image"   : "mcr.microsoft.com/devcontainers/python:<%= pythonVersion %>-bullseye",
+    "appPort" : [
+        8000
+    ],
+    "runArgs" : [
+        "--name=<%= name %>-backend"
+    ]
+}
