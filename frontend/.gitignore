@@ -1,0 +1,14 @@
+# Dependencies
+node_modules/
+
+# Testing
+coverage/
+html/
+
+# Generated
+dist/
+stats.html
+
+# Secrets
+.env
+.env.*

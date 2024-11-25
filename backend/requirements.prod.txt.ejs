@@ -1,0 +1,8 @@
+fastapi==0.115.6
+fastapi-cli==0.0.6
+pyyaml==6.0.2
+sentry-sdk[fastapi]==2.19.2
+sqlalchemy==2.0.36
+sqlmodel==0.0.22
+uvicorn==0.32.1<% dependencies.filter(dependency => dependency.tier === 'backend' && !dependency.devOnly).forEach(dependency => { %>
+<%= dependency.id ?? dependency.name %><%= dependency.version === 'Latest' ? '' : `==${dependency.version}` %><% }) %>
