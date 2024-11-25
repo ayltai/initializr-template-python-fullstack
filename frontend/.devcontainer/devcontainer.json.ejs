@@ -1,0 +1,11 @@
+{
+    "name"    : "Debian",
+    "image"   : "mcr.microsoft.com/devcontainers/typescript-node:<%= nodeVersion %>-bullseye",
+    "appPort" : [
+        5173,
+        6006
+    ],
+    "runArgs" : [
+        "--name=<%= name %>-frontend"
+    ]
+}
