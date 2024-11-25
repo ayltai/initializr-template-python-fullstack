@@ -1,0 +1,58 @@
+from configparser import ConfigParser
+from contextlib import asynccontextmanager
+from logging.config import dictConfig
+from os import path
+from sys import argv
+
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from sentry_sdk import init
+from uvicorn.config import LOGGING_CONFIG
+from yaml import safe_load
+
+from .data.database import init_db
+from .routers import checks, counts
+
+
+class SpaStaticFiles(StaticFiles):
+    # pylint: disable=redefined-outer-name
+    def lookup_path(self, path: str):
+        full_path, stat_result = super().lookup_path(path)
+        if stat_result is None:
+            full_path, stat_result = super().lookup_path('index.html')
+        return full_path, stat_result
+
+
+@asynccontextmanager
+async def lifespan(_: FastAPI):
+    init_db()
+
+    yield
+
+
+LOGGING_CONFIG['formatters']['default']['fmt'] = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+
+with open(path.join(path.dirname(__file__), 'log_conf.yaml'), 'r', encoding='utf-8') as file:
+    dictConfig(safe_load(file.read()))
+
+config = ConfigParser()
+config.read(path.join(path.dirname(__file__), 'config.ini'))
+
+if argv[1] != 'dev':
+    init(dsn=config['sentry']['dsn'])
+
+app = FastAPI(
+    title='<%= name %> API',
+    version='v1',
+    summary='<%= description %>',
+    description='<%= description %>',
+    lifespan=lifespan)
+
+app.include_router(checks.router)
+app.include_router(counts.router)
+
+app.add_middleware(CORSMiddleware, allow_headers=['*'], allow_methods=['*'], allow_origins=['*'])
+
+if argv[1] != 'dev':
+    app.mount('/web', SpaStaticFiles(directory=path.join(path.dirname(__file__), '..', 'web'), html=True), name='web')
